@@ -1,69 +1,90 @@
-import Image from "next/image";
+'use client';
+
+import { useState } from 'react'; // useEffect는 삭제해도 됩니다.
+import { motion } from 'framer-motion';
+import fortunes from './data.json';
 
 export default function Home() {
+  const [result, setResult] = useState<{ title: string; desc: string } | null>(null);
+
+  const handleDrawTarot = () => {
+    const randomIndex = Math.floor(Math.random() * fortunes.length);
+    setResult(fortunes[randomIndex]);
+  };
+
+  // 카카오톡 공유 기능 수정본
+  const shareToKakao = () => {
+    if (!result) return;
+    
+    const kakao = (window as any).Kakao;
+    
+    // 1. 카카오 스크립트 로드 확인
+    if (!kakao) {
+      alert('카카오 공유 스크립트가 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+
+    // 2. ★ 핵심: 공유 버튼을 누를 때 초기화 여부를 확인하고, 안 되어 있다면 여기서 초기화
+    if (!kakao.isInitialized()) {
+      kakao.init('315386572662ba0f47f4acfabfd897cf'); 
+    }
+
+    // 3. 공유 기능 실행
+    kakao.Share.sendDefault({
+      objectType: 'feed',
+      content: {
+        title: result.title,
+        description: result.desc,
+        imageUrl: 'https://developers.kakao.com/assets/img/about/logos/kakaolink/kakaolink_btn_medium.png',
+        link: {
+          mobileWebUrl: 'http://localhost:3000',
+          webUrl: 'http://localhost:3000',
+        },
+      },
+      buttons: [
+        {
+          title: '내 타로 뽑아보기',
+          link: {
+            mobileWebUrl: 'http://localhost:3000',
+            webUrl: 'http://localhost:3000',
+          },
+        },
+      ],
+    });
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <main className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-4">
+      <h1 className="text-4xl font-bold text-gray-800 mb-8">개발자 버그 타로 🃏</h1>
+      
+      <button 
+        onClick={handleDrawTarot}
+        className="px-8 py-4 bg-gray-900 text-white text-lg font-bold rounded-2xl shadow-lg hover:bg-gray-700 transition-all z-10 mb-8"
+      >
+        {result ? '다른 카드 뽑아보기' : '내 버그 타로 뽑기'}
+      </button>
+
+      {result && (
+        <div style={{ perspective: 1000 }} className="flex flex-col items-center">
+          <motion.div
+            key={result.title}
+            initial={{ rotateY: 180, scale: 0.5, opacity: 0 }}
+            animate={{ rotateY: 0, scale: 1, opacity: 1 }}
+            transition={{ duration: 0.6, type: 'spring', bounce: 0.4 }}
+            className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center border-t-4 border-gray-900 mb-6"
           >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            <h2 className="text-2xl font-bold text-red-600 mb-4">{result.title}</h2>
+            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{result.desc}</p>
+          </motion.div>
+          
+          <button 
+            onClick={shareToKakao}
+            className="px-6 py-3 bg-[#FEE500] text-[#000000] font-bold rounded-xl shadow hover:bg-[#F4DC00] transition-all flex items-center gap-2"
           >
-            Documentation
-          </a>
+            카카오톡으로 결과 공유하기
+          </button>
         </div>
-      </main>
-    </div>
+      )}
+    </main>
   );
 }

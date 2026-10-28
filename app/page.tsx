@@ -37,16 +37,16 @@ export default function Home() {
         description: result.desc,
         imageUrl: 'https://developers.kakao.com/assets/img/about/logos/kakaolink/kakaolink_btn_medium.png',
         link: {
-          mobileWebUrl: 'http://localhost:3000',
-          webUrl: 'http://localhost:3000',
+          mobileWebUrl: 'https://bug-tarot.vercel.app',
+          webUrl: 'https://bug-tarot.vercel.app',
         },
       },
       buttons: [
         {
           title: '내 타로 뽑아보기',
           link: {
-            mobileWebUrl: 'http://localhost:3000',
-            webUrl: 'http://localhost:3000',
+            mobileWebUrl: 'https://bug-tarot.vercel.app',
+            webUrl: 'https://bug-tarot.vercel.app',
           },
         },
       ],
@@ -76,13 +76,13 @@ export default function Home() {
             <h2 className="text-2xl font-bold text-red-600 mb-4">{result.title}</h2>
             <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{result.desc}</p>
           </motion.div>
-          
+          /*
           <button 
             onClick={shareToKakao}
             className="px-6 py-3 bg-[#FEE500] text-[#000000] font-bold rounded-xl shadow hover:bg-[#F4DC00] transition-all flex items-center gap-2"
           >
             카카오톡으로 결과 공유하기
-          </button>
+          </button>*/
         </div>
       )}
     </main>
